@@ -68,7 +68,8 @@ class Location(object):
         
         if (len(self.country) != 0):
             redisConn.sadd("allcountries", self.country)
-        #redisConn.sadd("country:%s" % self.country, json.dumps({'country' : self.country, 'country_code': self.country_code} ))
+        
+
 
         
         #redisConn.sadd("country:%s.states_names" % self.state)
@@ -77,6 +78,10 @@ class Location(object):
             redisConn.sadd("country:%s.states" % (self.country),  self.state)
         if (len(self.state) != 0):
             redisConn.sadd("country:%s.%s.cities" % (self.country, self.state), self.name)
+            redisConn.set("country:%s.%s.%s" % (self.country, self.state, self.name) , json.dumps({'country' : self.country, 'country_code': self.country_code, 'state': self.state, 'city': self.name, 'lat': self.lat, 'lon': self.lon } ))
+
+
+           # redisConn.hmset("cityhash:%s)
         
 
     def _indexGeohash(self, redisConn):
