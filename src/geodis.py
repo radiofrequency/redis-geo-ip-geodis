@@ -87,14 +87,14 @@ def resolveIP(ip):
     r = redis.Redis(host = redis_host, port = redis_port, db = redis_db)
 
     loc = IPLocation.get(ip, r)
-    print loc
+    # print loc
     
 
 def resolveCoords(lat, lon):
     global redis_host, redis_port, redis_db
     r = redis.Redis(host = redis_host, port = redis_port, db = redis_db)
     loc = City.getByLatLon(lat, lon, r)
-    print loc
+    # print loc
 
 
 if __name__ == "__main__":

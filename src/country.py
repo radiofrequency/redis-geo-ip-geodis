@@ -28,30 +28,30 @@ from countries import countries
 from location import Location
 import json
 
-class City(Location):
+class Country(Location):
     """
-    Wrapper for a city location object
+    Wrapper for a country location object
     """
 
-    #what we want to save for a city
-    __spec__ = Location.__spec__ + ['country', 'state', 'population', 'country_code', 'altname']
+    #what we want to save for a country
+    __spec__ = Location.__spec__ + ['population', 'countrycode', 'altname']
 
     #key is identical to what we want to save
     __keyspec__ = None
     
     def __init__(self, **kwargs):
 
-        super(City, self).__init__(**kwargs)
+        super(Country, self).__init__(**kwargs)
         self.altname = kwargs.get('altname', None)
-        self.country_code = kwargs.get('country', None)
-        self.country = countries.get( kwargs.get('country', None), kwargs.get('country', '')).strip()
-        self.state = kwargs.get('state', '').strip()
+        self.countrycode = kwargs.get('countrycode', None)
+        # self.name = countries.get( kwargs.get('country', None), kwargs.get('country', '')).strip()
         self.population = kwargs.get('population', '').strip()
-        
+
 
     def save(self, redisConn):
         #save all properties
         redisConn.hmset(self.getId(), dict(((k, getattr(self, k)) for k in \
                                         self.__spec__)))
-        redisConn.sadd("country:%s.%s.cities" % (self.country, self.state), self.name)
-        redisConn.set("country:%s.%s.%s" % (self.country, self.state, self.name) , json.dumps({'country' : self.country, 'country_code': self.country_code, 'state': self.state, 'city': self.name, 'lat': self.lat, 'lon': self.lon } ))        
+        redisConn.sadd("country_codes", self.countrycode)
+        redisConn.sadd("allcountries", self.name)
+        redisConn.set("country:%s" % (self.name), json.dumps({'country' : self.name, 'country_code' : self.countrycode, 'lat' : self.lat, 'lon' : self.lon }))

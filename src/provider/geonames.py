@@ -27,6 +27,8 @@
 #Importer for locations from geonames
 
 from city import City
+from state import State
+from country import Country
 import csv
 import logging
 import redis
@@ -101,7 +103,7 @@ class GeonamesImporter(Importer):
             logging.error("could not open file %s for reading: %s" % (self.fileName, e))
             return False
 
-        reader = csv.reader(fp, delimiter='\t')
+        reader = csv.reader(fp, delimiter='\t', quotechar="|")
         pipe = self.redis.pipeline()
 
         i = 0
@@ -127,7 +129,13 @@ class GeonamesImporter(Importer):
 
                 #print featureclass
 
-                if "P" not in featureclass: continue
+                # valid_classes = ["P", "A"]
+                valid_countries = ["PCLD", "PCLI", "PCLF", "TERR", "PCLS", "PCL"]
+                valid_states = ['ADM1']
+                valid_cities = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLG', 'PPLL']
+                valid_location = valid_cities + valid_countries + valid_states
+                if featurecode not in valid_location: continue
+                #if "P" not in featureclass: continue
                 #print "not skipping"
                 #print featureclass
 
@@ -164,19 +172,34 @@ class GeonamesImporter(Importer):
 #                lat = float(row[4])
 #                lon = float(row[5])#
 
-                loc = City(name = name,
-                                country = country,
-                                state = region,
-                                altname = altname,
-                                lat = lat,
-                                lon = lon)
-
+                if featurecode in valid_countries:
+                    print name
+                    loc = Country(name = name,
+                                    countrycode = countrycode, 
+                                    altname = altname,
+                                    lat = lat,
+                                    lon = lon)
+                elif featurecode in valid_states:
+                    loc = State(name = name, 
+                                        country = country,
+                                        altname = altname,
+                                        lat = lat,
+                                        lon = lon)
+                    print loc.name
+                else:
+                    loc = City(name = name,
+                                    country = country,
+                                    state = region,
+                                    altname = altname,
+                                    lat = lat,
+                                    lon = lon)
                 loc.save(pipe)
 
 
 
             except Exception, e:
-                logging.error("Could not import line %s: %s" % (row, e))
+                # logging.error("Could not import line %s: %s" % (row, e))
+                logging.error("Could not import a line")
             i += 1
             if i % 1000 == 0:
                 pipe.execute()

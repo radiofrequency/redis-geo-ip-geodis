@@ -55,33 +55,32 @@ class Location(object):
 
         return '%s:geohash' % cls.__name__
 
-    def save(self, redisConn):
+    # def save(self, redisConn):
+    #     #print "save"
+    #     #save all properties
+    #     redisConn.hmset(self.getId(), dict(((k, getattr(self, k)) for k in \
+    #                                     self.__spec__)))
+    #     #print self.country_code
 
-        #print "save"
-        #save all properties
-        redisConn.hmset(self.getId(), dict(((k, getattr(self, k)) for k in \
-                                        self.__spec__)))
-        #print self.country_code
-
-        if (len(self.country_code) != 0):
-            redisConn.sadd("country_codes", self.country_code)
+    #     if (len(self.country_code) != 0):
+    #         redisConn.sadd("country_codes", self.country_code)
         
-        if (len(self.country) != 0):
-            redisConn.sadd("allcountries", self.country)
+    #     if (len(self.country) != 0):
+    #         redisConn.sadd("allcountries", self.country)
         
 
 
         
-        #redisConn.sadd("country:%s.states_names" % self.state)
+    #     #redisConn.sadd("country:%s.states_names" % self.state)
 
-        if (len(self.state) != 0):
-            redisConn.sadd("country:%s.states" % (self.country),  self.state)
-        if (len(self.state) != 0):
-            redisConn.sadd("country:%s.%s.cities" % (self.country, self.state), self.name)
-            redisConn.set("country:%s.%s.%s" % (self.country, self.state, self.name) , json.dumps({'country' : self.country, 'country_code': self.country_code, 'state': self.state, 'city': self.name, 'lat': self.lat, 'lon': self.lon } ))
+    #     if (len(self.state) != 0):
+    #         redisConn.sadd("country:%s.states" % (self.country),  self.state)
+    #     if (len(self.state) != 0):
+    #         redisConn.sadd("country:%s.%s.cities" % (self.country, self.state), self.name)
+    #         redisConn.set("country:%s.%s.%s" % (self.country, self.state, self.name) , json.dumps({'country' : self.country, 'country_code': self.country_code, 'state': self.state, 'city': self.name, 'lat': self.lat, 'lon': self.lon } ))
 
 
-           # redisConn.hmset("cityhash:%s)
+    #        # redisConn.hmset("cityhash:%s)
         
 
     def _indexGeohash(self, redisConn):
